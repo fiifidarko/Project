@@ -168,13 +168,13 @@ def chart():
     values = getDaysValues()
     data_days = range(1,32)
     for count in range(0,31):
-    	data_days[count] = values[count]
+    	data_days[count] = values[count+1]
 	
     # populate data_months[] with the number of images taken during each month [index = month, value = number images taken during month]
     values = getMonthsValues()
     data_months = range(1,13) 
     for count in range(0,12):
-    	data_months[count] = values[count]
+    	data_months[count] = values[count+1]
 
     # populate data_categories[] with the number of human images and false positive images
     data_categories = [humanobjects, fpobjects]
