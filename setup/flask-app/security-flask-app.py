@@ -185,7 +185,7 @@ def chart():
 	
     # the last two arguments representing the fourth graph should be removed
     return render_template('chart.html', values=data_days, labels=range_of_days, values2=data_months, labels2=labels_months,
-    	values3=data_categories, labels3=labels_categories, values4=defunct, labels4=defunct)
+    	values3=data_categories, labels3=labels_categories, values4=values4, labels4=labels4)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5001)
