@@ -19,10 +19,6 @@ AWS_SECRET= data.get('AWS_SECRET', '')
 REGION = data.get('REGION', '')
 BUCKET = data.get('BUCKET', '')
 
-Days = range(1,32)
-# print Days
-days_dict= dict.fromkeys(Days)
-
 def most_common(lst):
     return max(set(lst), key=lst.count)
 
@@ -115,66 +111,81 @@ weaponobjects = os.popen('aws s3 ls s3://raspcam-archive/weapons/ --recursive --
 # print "Total false positives: ",fpobjects
 # print "Total weapons detected: ", weaponobjects
 
-
-def getValue():
+# returns the number of images taken during each day of the current month
+def getDaysValues():
+	# create a dictionary in which {key = day of month : value = number images taken during day of month}
+	Days = range(1,32)
+	days_dict = dict.fromkeys(Days)
+	
+	# the first data value is always invalid
 	del hday[0]
+	
+	# initialize all values to 0 (to avoid value == None)
 	for day in days_dict:
 		days_dict[day] = 0
+		
+	# count the number of images taken during each day of the month
 	for day in hday:
 		day = int(day)
-		days_dict[day]+=1
+		days_dict[day] += 1
+	
 	return days_dict
-	# print days_dict
 
+# returns the number of images taken during each month of the current year
+def getMonthsValues():
+	# create a dictionary in which {key = month of year : value = number images taken during month of year}
+	Months = range(1,13)
+	months_dict = dict.fromkeys(Months)
+	
+	# the first data value is always invalid
+	del hmonth[0]
+	
+	# initialize all values (to avoid value == None)
+	for month in months_dict:
+		months_dict[month] = 0
+	
+	# count the number of images taken during each day of the month
+	for month in hmonth:
+		month = int(month)
+		months_dict[month] += 1
+		
+	return months_dict
+	
 
-getValue()
-
-                           
-
-
-
-
-# FLASK APP 
+#################### FLASK APP ####################
 app = Flask(__name__)
  
 @app.route("/")
 def chart():
-    
-    labels = {"January": 1,"February": 2,"March": 3,"April": 4,"May": 5,"June": 6,"July": 7,"August": 8, "September": 9, "October": 10, "November": 11, "December": 12}
-    labels_days = range(1,32)
-    values = getValue()
-    count = 0
-    data = range(1,13) 
-    for key in labels:
-    	data[count] = values[labels[key]]
-    	count+=1
-    labels = ["January","February","March","April","May","June","July","August", "September", "October", "November", "December"]
-    
+    # various labels to be used with the graphs rendering data
+    # labels_months = {"January": 1,"February": 2,"March": 3,"April": 4,"May": 5,"June": 6,"July": 7,"August": 8, "September": 9, "October": 10, "November": 11, "December": 12}
+    labels_months = ["January","February","March","April","May","June","July","August", "September", "October", "November", "December"]    
+    labels_categories = ["People Spotted","False Alarm"]
+    range_of_months = range(1,13)
+    range_of_days = range(1,32)
+
+    # populate data_days[] with the number of images taken during each day of month [index = day of month, value = number images taken during day of month]
+    values = getDaysValues()
     data_days = range(1,32)
-    count =0
-    for day in labels_days:
-    	data_days[count] = values[day]
-    	count +=1
+    for day in range_of_days:
+    	data_days[day] = values[day]
+	
+    # populate data_months[] with the number of images taken during each month [index = month, value = number images taken during month]
+    values = getMonthsValues()
+    data_months = range(1,13) 
+    for month in range_of_months:
+    	data_months[month] = values[month]
 
+    # populate data_categories[] with the number of human images and false positive images
+    data_categories = [humanobjects, fpobjects]
 
-
-
-    # values = getValue() 
-    # labels.sort()
-    # labels= labels.sort()
-    print data
-    # print sorted(labels.items(), key =lambda x: x[1])
-
-
-    labels2 = {"January": 1,"February": 2,"March": 3,"April": 4,"May": 5,"June": 6,"July": 7,"August": 8, "September": 9, "October": 10, "November": 11, "December": 12}    
-    values2 = [10,9,8,7,6,4,7,8]
-
-    labels3 = ["People Spotted","False Alarm"]
-    values3 = [humanobjects,fpobjects]
+    # we are removing the fourth graph
     labels4 = {"January": 1,"February": 2,"March": 3,"April": 4,"May": 5,"June": 6,"July": 7,"August": 8, "September": 9, "October": 10, "November": 11, "December": 12}    
     values4 = [10,9,8,7,6,4,7,8]
-    return render_template('chart.html', values=data_days, labels=labels_days,values2=values2, labels2=labels2,
-    	values3=values3, labels3=labels3, values4=values4, labels4=labels4)
+	
+    # the last two arguments representing the fourth graph should be removed
+    return render_template('chart.html', values=data_days, labels=range_of_days, values2=data_months, labels2=labels_months,
+    	values3=data_categories, labels3=labels_categories, values4=defunct, labels4=defunct)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5001)
