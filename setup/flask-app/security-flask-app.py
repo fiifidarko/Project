@@ -161,20 +161,20 @@ def chart():
     # labels_months = {"January": 1,"February": 2,"March": 3,"April": 4,"May": 5,"June": 6,"July": 7,"August": 8, "September": 9, "October": 10, "November": 11, "December": 12}
     labels_months = ["January","February","March","April","May","June","July","August", "September", "October", "November", "December"]    
     labels_categories = ["People Spotted","False Alarm"]
-    range_of_months = range(1,13)
+    #range_of_months = range(1,13)
     range_of_days = range(1,32)
 
     # populate data_days[] with the number of images taken during each day of month [index = day of month, value = number images taken during day of month]
     values = getDaysValues()
     data_days = range(1,32)
-    for day in range_of_days:
-    	data_days[day] = values[day]
+    for count in range(1,32):
+    	data_days[count] = values[count]
 	
     # populate data_months[] with the number of images taken during each month [index = month, value = number images taken during month]
     values = getMonthsValues()
     data_months = range(1,13) 
-    for month in range_of_months:
-    	data_months[month] = values[month]
+    for count in range(1,13):
+    	data_months[count] = values[count]
 
     # populate data_categories[] with the number of human images and false positive images
     data_categories = [humanobjects, fpobjects]
